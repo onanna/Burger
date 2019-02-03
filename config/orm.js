@@ -1,27 +1,36 @@
-// import connection.js
-var connection = require("./connection")
+const connection = require("./connection.js");
 
-var orm = {
-    all: function(tableInput, cb){
-        connection.query("SELECT * FROM " + tableInput + ";", function(err, result){
-            if (err) throw err;
-            cb(result)
-        })
-    },
-    update: function (tableInput, condition, cb){
-        connection.query("UPDATE " + tableInput+ "SET devoured=true WHERE id=" + condition+ ";", function(err, result){
-            if (err) throw err;
-            cb(result);
-        })
-    },
-    
-    create: function(tableInput, val, cb){
-        connection.query("INSERT INTO " + tableInput + " (burger_name)VALUES ('"+val+"');", function(err, result){
-            if(err) throw err;
-            cb(result)
-        })
-    }
-}
-
+const orm = {
+  //this will grab all information from database
+  selectAll: (cb) => {
+    connection.query("SELECT * FROM burgers", (err, res) => {
+      if (err) throw err;
+      console.log(res);
+      cb(res);
+    });
+  },
+  //this will allow you to add more burgers to the database
+  insertOne: (burgerName, cb) => {
+    connection.query(
+        "INSERT INTO burgers SET ?",
+        {
+          burger_name: burgerName,
+          devoured: false
+        }, (err, res) => {
+        if (err) throw err;
+        console.log(res);
+        cb(res);
+        });
+  },
+  //this will allow you to devour a burger by ID.
+  updateOne: (burgerID, cb) => {
+    let queryString = "UPDATE burgers SET devoured = true WHERE id = ?";
+    connection.query(queryString, burgerID, (err, res) => {
+        if (err) throw err;
+        console.log(res);
+        cb(res);
+      });
+  }
+};
 
 module.exports = orm;
